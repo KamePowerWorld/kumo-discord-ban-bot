@@ -16,14 +16,16 @@ def load_config():
     
 @bot.event
 async def on_ready():
-    global target_channel_id
+    global target_id
     global guild_id
+    global target_thread_id
     print(f'Logged in as {bot.user.name}')
     
 
     config = load_config()
     guild_id = config.get('guild_id', None)
-    target_channel_id = config.get('target_id', None)
+    target_id = config.get('target_id', None)
+    target_thread_id = config.get('target_thread_id', None)
     if guild_id:
         guild = bot.get_guild(guild_id)
         
@@ -32,12 +34,19 @@ async def on_ready():
 
 @bot.event
 async def on_member_ban(guild:discord.Guild, user:discord.User):
-    global target_channel_id
+    global target_id
+    global target_thread_id
     global guild_id
     if guild.id != guild_id :
         return
     now = datetime.datetime.now()
-    target_channel = bot.get_channel(target_channel_id)
+    target_channel = bot.get_channel(target_id)
+    target_thread = target_channel.get_thread(target_thread_id)
+    if target_thread is None:
+        target = target_channel
+    else :
+        target = target_thread
+
     banned_by = None
 
     async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban):
@@ -45,7 +54,7 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
             banned_by = entry.user
             break
     
-    if target_channel:
+    if target:
         embed = discord.Embed(
             title=f"{banned_by.name}",
             color=discord.Color.red()  # 赤色
@@ -71,7 +80,7 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_author(name="Member Banned", icon_url=user.display_avatar.url)
         embed.set_footer(text=banned_by.name, icon_url=banned_by.display_avatar.url)
-        await target_channel.send(embed=embed)
+        await target.send(embed=embed)
 
 
 
