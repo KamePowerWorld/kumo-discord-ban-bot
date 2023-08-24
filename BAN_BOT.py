@@ -11,7 +11,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 def load_config():
-    with open('ban_config.yml', 'r') as config_file:
+    with open('config.yml', 'r') as config_file:
         return yaml.load(config_file, Loader=yaml.SafeLoader)
     
 @bot.event
