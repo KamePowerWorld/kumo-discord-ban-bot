@@ -55,7 +55,9 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
             break
     
     if target:
-        embed = discord.Embed(
+        if banned_by.name is not None :
+            banned_by.name == "不明"
+        embed = discord.Embed(                
             title=f"{banned_by.name}",
             color=discord.Color.red()  # 赤色
         )
