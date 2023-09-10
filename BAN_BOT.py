@@ -33,18 +33,18 @@ async def on_ready():
             await guild.chunk()
 
 @bot.event
-async def on_member_ban(guild:discord.Guild, user:discord.User):
+async def on_member_ban(guild: discord.Guild, user: discord.User):
     global target_id
     global target_thread_id
     global guild_id
-    if guild.id != guild_id :
+    if guild.id != guild_id:
         return
     now = datetime.datetime.now()
     target_channel = bot.get_channel(target_id)
     target_thread = target_channel.get_thread(target_thread_id)
     if target_thread is None:
         target = target_channel
-    else :
+    else:
         target = target_thread
 
     banned_by = None
@@ -53,16 +53,19 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
         if entry.target == user:
             banned_by = entry.user
             break
-    
+
     if target:
-        if banned_by.name is not None :
-            banned_by.name == "不明"
-        embed = discord.Embed(                
-            title=f"{banned_by.name}",
+        if banned_by.name is not None:
+            banned_by_name = banned_by.name  # banned_by.nameがNoneでない場合に名前を取得
+        else:
+            banned_by_name = "不明"  # がNoneの場合、"不明"として設定
+
+        embed = discord.Embed(
+            title=f"{banned_by_name}",
             color=discord.Color.red()  # 赤色
         )
-        
-        embed.timestamp=now
+
+        embed.timestamp = now
         embed = Embed(
             type="rich",
             title="",
@@ -71,8 +74,7 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
             timestamp=now
         )
 
-        embed.add_field(name="ID", value=user.name, inline=False)
-        embed.add_field(name="ニックネーム", value=user.global_name, inline=False)
+        embed.add_field(name="ID", value=user.id, inline=False)  # user.nameをuser.idに修正
         if isinstance(user, discord.Member) and user.nick is not None:
             embed.add_field(name="サーバーニックネーム", value=user.nick, inline=False)
         ban_entry = await guild.fetch_ban(user)
@@ -81,8 +83,9 @@ async def on_member_ban(guild:discord.Guild, user:discord.User):
 
         embed.set_thumbnail(url=user.display_avatar.url)
         embed.set_author(name="Member Banned", icon_url=user.display_avatar.url)
-        embed.set_footer(text=banned_by.name, icon_url=banned_by.display_avatar.url)
+        embed.set_footer(text=banned_by_name, icon_url=banned_by.display_avatar.url)
         await target.send(embed=embed)
+
 
 
 
