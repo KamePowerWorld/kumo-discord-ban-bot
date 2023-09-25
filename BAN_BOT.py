@@ -74,9 +74,13 @@ async def on_member_ban(guild: discord.Guild, user: discord.User):
             timestamp=now
         )
 
-        embed.add_field(name="ID", value=user.id, inline=False)  # user.nameをuser.idに修正
-        if isinstance(user, discord.Member) and user.nick is not None:
+        embed.add_field(name="ID", value=user.id, inline=False)  
+        if isinstance(user, discord.Member) and user.nick is not None :
             embed.add_field(name="サーバーニックネーム", value=user.nick, inline=False)
+        elif isinstance(user, discord.Member) and user.name is not None :
+            embed.add_field(name="サーバーニックネーム", value=user.name, inline=False)
+        else:
+            embed.add_field(name="サーバーニックネーム", value="不明", inline=False)
         ban_entry = await guild.fetch_ban(user)
         ban_reason = ban_entry.reason if ban_entry.reason else '不明'
         embed.add_field(name='BAN理由', value=ban_reason, inline=False)
