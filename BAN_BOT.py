@@ -77,6 +77,7 @@ class MyClient(Client):
         global target_id
         global guild_id
         global target_thread_id
+        global rollid
         print(f'Logged in as {client.user.name}')
         
 
@@ -84,6 +85,7 @@ class MyClient(Client):
         guild_id = config.get('guild_id', None)
         target_id = config.get('target_id', None)
         target_thread_id = config.get('target_thread_id', None)
+        rollid =config.get("rollid", None)
         if guild_id:
             guild = client.get_guild(guild_id)
             
@@ -101,44 +103,52 @@ def load_config():
         return yaml.load(config_file, Loader=yaml.SafeLoader)
 
 
-@client.tree.context_menu()
+@client.tree.context_menu(name="このメッセージを利用してBANする。")
 async def greeting(interaction: Interaction, message: Message):  # original_messageをmessageに変更
-    await interaction.response.send_modal(Feedback())
-    global ban_bynamedisplay_avatarurl
-    global ban_user
-    global ban_bytext
-    global switch
-    ban_user = message.author  # original_messageをmessageに変更
-    ban_bynamedisplay_avatarurl = message.author.display_avatar.url  # original_messageをmessageに変更
-
-    found_message = None
-
-    for channel in interaction.guild.text_channels:
-        try:
-            # メッセージIDを使用してメッセージを取得
-            msg = await channel.fetch_message(message.id)  # original_messageをmessageに変更
-            if msg:  # メッセージが見つかった場合
-                found_message = msg
-                break
-        except:
-            # メッセージが見つからない場合は、次のチャンネルに進む
-            continue
-
-    if found_message:
-        ban_bytext = found_message.content
+    global rollid
+    member = interaction.user.roles  # interaction.memberは通常、Memberオブジェクトを返すはずです。
+    # rollidがmemberの中のどれかのロールのIDと一致するかをチェック
+    has_role = any(role.id == rollid for role in member)
+    if not has_role:
+        await interaction.response.send_message('これを実行する権限がありません。', ephemeral=True)
+        return
     else:
-        ban_bytext = "メッセージが見つかりませんでした。"
-    # ギルド（サーバー）を取得
-    
-    guild = interaction.guild
+        await interaction.response.send_modal(Feedback())
+        global ban_bynamedisplay_avatarurl
+        global ban_user
+        global ban_bytext
+        global switch
+        ban_user = message.author  # original_messageをmessageに変更
+        ban_bynamedisplay_avatarurl = message.author.display_avatar.url  # original_messageをmessageに変更
 
-    # ユーザーIDを使ってユーザーオブジェクトを取得
-    user = await guild.fetch_member(message.author.id)
+        found_message = None
 
-    # ユーザーをBAN
-    switch = True
-    await guild.ban(user, reason="")
-    switch = False
+        for channel in interaction.guild.text_channels:
+            try:
+                # メッセージIDを使用してメッセージを取得
+                msg = await channel.fetch_message(message.id)  # original_messageをmessageに変更
+                if msg:  # メッセージが見つかった場合
+                    found_message = msg
+                    break
+            except:
+                # メッセージが見つからない場合は、次のチャンネルに進む
+                continue
+
+        if found_message:
+            ban_bytext = found_message.content
+        else:
+            ban_bytext = "メッセージが見つかりませんでした。"
+        # ギルド（サーバー）を取得
+        
+        guild = interaction.guild
+
+        # ユーザーIDを使ってユーザーオブジェクトを取得
+        user = await guild.fetch_member(message.author.id)
+
+        # ユーザーをBAN
+        switch = True
+        await guild.ban(user, reason="")
+        switch = False
 
 @client.event
 async def on_member_ban(guild: discord.Guild, user: discord.User):
