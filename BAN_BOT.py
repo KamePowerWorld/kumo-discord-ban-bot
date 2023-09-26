@@ -123,6 +123,22 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
 
         found_message = None
 
+        for channel in interaction.guild.voice_channels:
+            try:
+                # メッセージIDを使用してメッセージを取得
+                msg = await channel.fetch_message(message.id)  # original_messageをmessageに変更
+                if msg:  # メッセージが見つかった場合
+                    found_message = msg
+                    break
+            except:
+                # メッセージが見つからない場合は、次のチャンネルに進む
+                continue
+
+        if found_message:
+            ban_bytext = found_message.content
+        else:
+            ban_bytext = "メッセージが見つかりませんでした。"
+
         for channel in interaction.guild.text_channels:
             try:
                 # メッセージIDを使用してメッセージを取得
@@ -149,7 +165,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
 
         # ユーザーをBAN
         switch = True
-        await guild.ban(user, reason="")
+        #await guild.ban(user, reason="")
         switch = False
 
 @client.event
