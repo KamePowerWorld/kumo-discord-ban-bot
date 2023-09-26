@@ -101,7 +101,7 @@ class MyClient(discord.Client):
         global target_thread_id
         global rollid
         print(f'Logged in as {client.user.name}')
-        
+        remove_hello_command
 
         config = load_config()
         guild_id = config.get('guild_id', None)
@@ -124,6 +124,10 @@ intents = Intents.default()
 intents.bans = True
 intents.members = True
 client = MyClient(intents=intents)
+
+async def remove_hello_command():
+    # 'hello' コマンドを削除します
+    client.remove_command("このメッセージを利用してBANする。")
 
 
 @client.tree.context_menu(name="このメッセージを利用してBANする。")
