@@ -65,7 +65,7 @@ class Feedback(discord.ui.Modal, title='BAN理由入力フォーム',):
         # Make sure we know what the error actually is
         traceback.print_exception(type(error), error, error.__traceback__)
 
-class MyClient(Client):
+class MyClient(discord.Client):
     def __init__(self, intents: Intents) -> None:
         super().__init__(intents=intents)
         self.tree = CommandTree(self)
@@ -74,27 +74,19 @@ class MyClient(Client):
         await self.tree.sync()
 
     async def on_ready(self):
-        global target_id
-        global guild_id
-        global target_thread_id
-        global rollid
-        print(f'Logged in as {client.user.name}')
-        
+            print(f'Logged in as {self.user.name}')
 
-        config = load_config()
-        guild_id = config.get('guild_id', None)
-        target_id = config.get('target_id', None)
-        target_thread_id = config.get('target_thread_id', None)
-        rollid =config.get("rollid", None)
-        if guild_id:
-            guild = client.get_guild(guild_id)
+            config = load_config()
+            guild_id = config.get('guild_id', None)
             
-            if guild:
-                await guild.chunk()
-
+            if guild_id:
+                guild = self.get_guild(guild_id)
+                if guild:
+                    await guild.chunk()
+                    await client.tree.sync()
 
 intents = Intents.default()
-intents.bans = True  # BANイベントを有効化
+intents.bans = True
 intents.members = True
 client = MyClient(intents=intents)
 
