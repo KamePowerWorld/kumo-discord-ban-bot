@@ -113,7 +113,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
         await interaction.response.send_message('これを実行する権限がありません。', ephemeral=True)
         return
     else:
-        await interaction.response.send_modal(Feedback())
+
         global ban_bynamedisplay_avatarurl
         global ban_user
         global ban_bytext
@@ -141,6 +141,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
         # ギルド（サーバー）を取得
         
         guild = interaction.guild
+        await interaction.response.send_modal(Feedback())
 
         # ユーザーIDを使ってユーザーオブジェクトを取得
         user = await guild.fetch_member(message.author.id)
@@ -156,6 +157,7 @@ async def on_member_ban(guild: discord.Guild, user: discord.User):
     global target_thread_id
     global guild_id
     global switch
+
     if switch == True:
         return
 
