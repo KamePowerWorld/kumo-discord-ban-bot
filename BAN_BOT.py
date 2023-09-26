@@ -138,10 +138,11 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
             ban_bytext = found_message.content
         else:
             ban_bytext = "メッセージが見つかりませんでした。"
+        await interaction.response.send_modal(Feedback())
         # ギルド（サーバー）を取得
         
         guild = interaction.guild
-        await interaction.response.send_modal(Feedback())
+
 
         # ユーザーIDを使ってユーザーオブジェクトを取得
         user = await guild.fetch_member(message.author.id)
