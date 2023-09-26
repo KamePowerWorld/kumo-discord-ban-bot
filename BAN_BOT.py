@@ -117,7 +117,7 @@ class MyClient(discord.Client):
             sys.exit(1)
 
         await guild.chunk()
-        await client.tree.sync()
+        await self.tree.sync()
 
 
 intents = Intents.default()
