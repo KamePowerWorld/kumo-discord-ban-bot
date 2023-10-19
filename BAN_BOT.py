@@ -132,7 +132,6 @@ intents = Intents.default()
 intents.bans = True
 intents.members = True
 client = MyClient(intents=intents)
-client = discord.Client(reconnect=True)
 
 async def remove_hello_command():
     # 'hello' コマンドを削除します
