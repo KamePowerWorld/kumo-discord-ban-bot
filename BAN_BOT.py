@@ -33,13 +33,14 @@ class Feedback(
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(
-            f"正常にBANできました。理由: {self.name.value}!", ephemeral=True
+            f"正常にBANできました。理由: {self.name.value}", ephemeral=True
         )
         global target_id
         global target_thread_id
         global guild_id
         global ban_user
         global ban_bytext
+        global ban_urltext
         ban_text = self.name.value
         target_channel = client.get_channel(target_id)
         target_thread = target_channel.get_thread(target_thread_id)
@@ -75,6 +76,8 @@ class Feedback(
         embed.add_field(name="BAN理由", value=ban_text, inline=False)
 
         embed.add_field(name="BANの要因となったメッセージ", value=ban_bytext, inline=False)
+        embed.add_field(name="クリック", value=ban_urltext, inline=False)
+
         embed.set_thumbnail(url=ban_user.display_avatar.url)
         embed.set_author(name="BAN者情報", icon_url=ban_user.display_avatar.url)
         embed.set_footer(text=interaction.user, icon_url=banned_by)
@@ -129,6 +132,7 @@ intents = Intents.default()
 intents.bans = True
 intents.members = True
 client = MyClient(intents=intents)
+client = discord.Client(reconnect=True)
 
 async def remove_hello_command():
     # 'hello' コマンドを削除します
@@ -150,6 +154,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
         global ban_bynamedisplay_avatarurl
         global ban_user
         global ban_bytext
+        global ban_urltext
         global switch
         ban_user = message.author  # original_messageをmessageに変更
         ban_bynamedisplay_avatarurl = (
@@ -157,7 +162,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
         )  # original_messageをmessageに変更
 
         ban_bytext = message.content
-
+        ban_urltext = message.mention_everyone
         await interaction.response.send_modal(Feedback())
         # ギルド（サーバー）を取得
 
@@ -168,7 +173,7 @@ async def greeting(interaction: Interaction, message: Message):  # original_mess
 
         # ユーザーをBAN
         switch = True
-        # await guild.ban(user, reason="")
+        await guild.ban(user, reason="")
         switch = False
 
 
