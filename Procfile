@@ -1,0 +1,1 @@
+worker: python BAN_BOT.py
