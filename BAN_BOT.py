@@ -14,7 +14,9 @@ load_dotenv()
 
 
 def load_config():
-    with open("config.yml", "r") as config_file:
+    base_dir = os.environ.get("APP_BASEDIR", ".")
+    config_path = os.path.join(base_dir, "config.yml")
+    with open(config_path, "r") as config_file:
         return yaml.load(config_file, Loader=yaml.SafeLoader)
 
 
